@@ -18,13 +18,18 @@ jobs:
       - name: Instalar dependências do sistema
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf automake libtool libltdl-dev pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
 
       - name: Instalar Buildozer
-        run: pip install buildozer cython==0.29.36
+        run: pip install buildozer cython==0.29.36 setuptools
 
       - name: Compilar
-        run: buildozer -v android debug
+        shell: bash
+        run: buildozer android debug 2>&1 | tee build.log
+
+      - name: Mostrar fim do erro
+        if: failure()
+        run: tail -n 60 build.log
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
