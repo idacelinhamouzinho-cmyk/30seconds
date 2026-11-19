@@ -26,6 +26,14 @@ jobs:
             libncursesw5-dev libtinfo5 cmake \
             libffi-dev libssl-dev
 
+      - name: Aceitar licenças Android
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
+
       - name: Instalar Buildozer
         run: |
           pip install buildozer cython==0.29.36 setuptools
