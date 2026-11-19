@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v4
 
@@ -18,18 +19,34 @@ jobs:
       - name: Instalar dependências do sistema
         run: |
           sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk autoconf automake libtool libltdl-dev pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
+          sudo apt-get install -y \
+            git zip unzip openjdk-17-jdk \
+            autoconf automake libtool libltdl-dev \
+            pkg-config zlib1g-dev libncurses5-dev \
+            libncursesw5-dev libtinfo5 cmake \
+            libffi-dev libssl-dev
 
       - name: Instalar Buildozer
-        run: pip install buildozer cython==0.29.36 setuptools
+        run: |
+          pip install buildozer cython==0.29.36 setuptools
 
       - name: Compilar
         shell: bash
-        run: buildozer android debug 2>&1 | tee build.log
+        run: |
+          set -o pipefail
+          buildozer android debug 2>&1 | tee build.log
 
-      - name: Mostrar fim do erro
+      - name: Mostrar erro
         if: failure()
-        run: tail -n 60 build.log
+        run: |
+          echo "===== ÚLTIMAS 60 LINHAS ====="
+          grep -v '^# ' build.log | tail -n 60
+
+          echo ""
+          echo "===== LINHAS COM ERRO ====="
+          grep -n -i -E "error|failed|fatal|exception|command failed" build.log \
+            | grep -v -i -E "deprecated|warning" \
+            | tail -n 40
 
       - name: Guardar APK
         uses: actions/upload-artifact@v4
