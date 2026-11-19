@@ -17,7 +17,7 @@ fullscreen = 1
 android.api = 35
 android.minapi = 21
 android.ndk = 25b
-android.arch = arm64-v8a
+android.archs = arm64-v8a
 
 android.permissions = INTERNET
 
